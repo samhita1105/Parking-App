@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-0">Admin Dashboard</h3>
+    <a href="{{ url_for('new_lot') }}" class="btn btn-success"><i class="bi bi-plus-lg me-1"></i> Create New Lot</a>
+</div>
+
+<ul class="nav nav-tabs" id="adminTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="lots-tab" data-bs-toggle="tab" data-bs-target="#lots" type="button" role="tab" aria-controls="lots" aria-selected="true">Manage Lots</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" aria-controls="users" aria-selected="false">Registered Users</button>
+  </li>
+</ul>
+
+<div class="tab-content" id="adminTabContent">
+  <div class="tab-pane fade show active" id="lots" role="tabpanel" aria-labelledby="lots-tab">
+    <div class="table-responsive mt-3">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th><th>Name</th><th>Address</th><th>Capacity</th><th>Price/hr</th><th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lot in lots %}
+                <tr>
+                    <td>{{ lot.id }}</td>
+                    <td>{{ lot.name }}</td>
+                    <td>{{ lot.address }}</td>
+                    <td>{{ lot.capacity }}</td>
+                    <td>${{ "%.2f"|format(lot.price_per_hour) }}</td>
+                    <td>
+                        <a href="{{ url_for('edit_lot', lot_id=lot.id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil-fill"></i></a>
+                        <form action="{{ url_for('delete_lot', lot_id=lot.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure? This is irreversible.');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash-fill"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+  </div>
+  <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
+    <div class="table-responsive mt-3">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th><th>Username</th><th>Active Booking?</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{% if user.bookings|selectattr("end_time", "none")|list|length > 0 %}<span class="badge bg-success">Yes</span>{% else %}<span class="badge bg-secondary">No</span>{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
